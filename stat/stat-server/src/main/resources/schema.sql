@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS STATS
     ip        VARCHAR                     NOT NULL,
     timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_stat PRIMARY KEY (id)
-    );
+);

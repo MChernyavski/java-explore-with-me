@@ -24,12 +24,12 @@ services:
       - POSTGRES_USER=mariac
 
   ewm-service:
-   build: ./main-service
-   image: main-service
-   container_name: main-service-container
-   ports:
-    - "8080:8080"
+    build: ./main-service
+    image: main-service
+    container_name: main-service-container
+    ports:
+      - "8080:8080"
 
 
-    # ewm-db:
+      # ewm-db:
   #  image: postgres:14-alpine
