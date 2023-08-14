@@ -24,6 +24,7 @@
 
     <modules>
         <module>stat</module>
+        <module>main-service</module>
     </modules>
 
     <build>
