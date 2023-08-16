@@ -31,7 +31,7 @@ public class StatClient extends BaseClient {
         return post("/hit", endpointHitDto);
     }
 
-    public ResponseEntity<Object> getStat(String start, String end, List<String> uris, Boolean unique) {
+    public ResponseEntity<Object> getStat(String start, String end, List<String> uris, boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,
