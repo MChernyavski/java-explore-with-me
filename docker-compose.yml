@@ -32,6 +32,7 @@ services:
     depends_on:
       - ewm-db
     environment:
+      - STATS_SERVER_URL=http://stats-server:9090
       - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm
       - POSTGRES_USER=mariac
       - POSTGRES_PASSWORD=root
@@ -43,5 +44,5 @@ services:
       - "6542:5432"
     environment:
       - POSTGRES_DB=ewm
-      - POSTGRES_USER=maria
+      - POSTGRES_USER=mariac
       - POSTGRES_PASSWORD=root
