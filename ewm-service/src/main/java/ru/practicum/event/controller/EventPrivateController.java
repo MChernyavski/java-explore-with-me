@@ -69,8 +69,8 @@ public class EventPrivateController {
                                                                       @PathVariable @Positive Long userId,
                                                                       @RequestBody @Valid
                                                                          EventRequestStatusUpdateRequest
-                                                                                 eventRequestStatusUpdateRequest) {
+                                                                                 eventRequestStatusUpdate) {
         log.info("Updated request status for event: {}.", eventId);
-        return eventService.updateRequestStatusForEvent(userId, eventId, eventRequestStatusUpdateRequest);
+        return eventService.updateRequestStatusForEvent(eventRequestStatusUpdate, userId, eventId);
     }
 }

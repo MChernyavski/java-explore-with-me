@@ -48,14 +48,12 @@ public class RequestServiceImpl implements RequestService{
     @Override
     @Transactional
     public ParticipationRequestDto addRequest(long userId, long eventId) {
-        Request request;
+
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("User with id {} doesn't exist " + userId));
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id doesn't exist "));
-
-        event.setConfirmedRequests(requestRepository.getConfirmedRequestsByEvent(eventId));
 
         if (requestRepository.existsRequestByRequesterIdAndEventId(userId, eventId)) {
             throw new RequestConflictException("You can't add the same request");
@@ -73,7 +71,8 @@ public class RequestServiceImpl implements RequestService{
             throw new EventConflictException("The limit of requests for participation has been reached");
         }
 
-        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
+        Request request;
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0L) {
             request = Request.builder()
                     .event(event)
                     .created(LocalDateTime.now())
@@ -82,7 +81,7 @@ public class RequestServiceImpl implements RequestService{
                     .build();
 
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            eventRepository.save(event);
+           // eventRepository.save(event);
         } else {
             request = Request.builder()
                     .event(event)
@@ -91,7 +90,8 @@ public class RequestServiceImpl implements RequestService{
                     .status(RequestStatus.PENDING)
                     .build();
         }
-return RequestMapper.toParticipationRequestDto(requestRepository.save(request));
+        Request newRequest = requestRepository.save(request);
+        return RequestMapper.toParticipationRequestDto(newRequest);
     }
 
 

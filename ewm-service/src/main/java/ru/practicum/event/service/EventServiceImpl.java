@@ -54,7 +54,7 @@ import static ru.practicum.event.model.enums.EventState.PUBLISHED;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-@ComponentScan(basePackages = {"ru.practicum.client"})
+@ComponentScan("ru.practicum.client")
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
@@ -71,29 +71,6 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventFullDto addEvent(Long userId, NewEventDto newEventDto) {
-
-     /*   LocalDateTime eventDate = newEventDto.getEventDate();
-
-        if (eventDate.isBefore(LocalDateTime.now())) {
-            throw new WrongTimeException("Время начала события не может быть раньше текущего времени");
-        }
-        if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
-            throw new WrongTimeException("Дата начала события не может быть раньше, чем через 2 часа после текущего времени");
-        }
-
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("User with id {} doesn't exist " + userId));
-        Long catId = newEventDto.getCategory();
-        Category category = categoryRepository.findById(catId).orElseThrow(() ->
-                new NotFoundException("Сategory with id doesn't exist " + catId));
-
-
-        Location location = LocationMapper.toLocation(newEventDto.getLocation());
-        locationRepository.save(location);
-        Event event = EventMapper.toEvent(newEventDto, category, user, location);
-        Event result = eventRepository.save(event);
-        return EventMapper.toEventFullDto(result);
-*/
 
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("User with id {} doesn't exist " + userId));
@@ -116,13 +93,13 @@ public class EventServiceImpl implements EventService {
         event.setViews(0L);
         event.setConfirmedRequests(0L);
         Event newEvent = eventRepository.save(event);
-        return toEventFullDto(newEvent);
+        return EventMapper.toEventFullDto(newEvent);
 
     }
 
     @Override
     @Transactional
-    public EventFullDto updateEvent(long userId, long eventId, UpdateEventUserRequestDto updateEventRequestDto) {
+    public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequestDto updateEventRequestDto) {
 
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("User with id {} doesn't exist " + userId));
@@ -130,7 +107,11 @@ public class EventServiceImpl implements EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id doesn't exist"));
 
-        if (event.getState() != null && event.getState() == EventState.PUBLISHED) {
+        if (!userId.equals(event.getInitiator().getId())) {
+            throw new RequestConflictException("Only the event initiator can change the status of an event request");
+        }
+//event.getState() != null &&
+        if (event.getState() == EventState.PUBLISHED) {
             throw new EventConflictException("Event already published, only pending or canceled events can be changed");
         }
 
@@ -158,6 +139,8 @@ public class EventServiceImpl implements EventService {
             Location location = event.getLocation();
             location.setLon(updateEventRequestDto.getLocation().getLon());
             location.setLat(updateEventRequestDto.getLocation().getLat());
+            //event.setLocation(location);
+            locationRepository.save(location);
             event.setLocation(location);
         }
 
@@ -173,24 +156,26 @@ public class EventServiceImpl implements EventService {
             event.setRequestModeration(updateEventRequestDto.getRequestModeration());
         }
 
-        if (updateEventRequestDto.getStateAction() == null) {
-            return EventMapper.toEventFullDto(eventRepository.save(event));
+        if (updateEventRequestDto.getStateAction() != null) {
+            StateUserAction state = updateEventRequestDto.getStateAction();
+            switch (state) {
+                case SEND_TO_REVIEW:
+                    event.setState(EventState.PENDING);
+                    break;
+                case CANCEL_REVIEW:
+                    event.setState(EventState.CANCELED);
+                    break;
+                default:
+                    throw new NotFoundException("Недопустимый формат state");
+            }
         }
-        if (updateEventRequestDto.getStateAction() == StateUserAction.SEND_TO_REVIEW) {
-            event.setState(EventState.PENDING);
-        }
-        if (updateEventRequestDto.getStateAction() == StateUserAction.CANCEL_REVIEW) {
-            event.setState(EventState.CANCELED);
-        }
-
 
         if (updateEventRequestDto.getTitle() != null) {
             updateEventRequestDto.setTitle(updateEventRequestDto.getTitle());
         }
         Event updateEvent = eventRepository.save(event);
-        locationRepository.save(updateEvent.getLocation());
-        Map<Long, Long> hits = getViewsFromStatistic(List.of(updateEvent));
-        event.setViews(hits.get(event.getId()));
+     //   Map<Long, Long> hits = getViewsFromStatistic(List.of(updateEvent)); //?
+       // event.setViews(hits.get(event.getId())); //?
         return EventMapper.toEventFullDto(updateEvent);
     }
 
@@ -206,69 +191,58 @@ public class EventServiceImpl implements EventService {
      */
     @Override
     @Transactional
-    public EventRequestStatusUpdateResult updateRequestStatusForEvent(Long eventId, Long userId,
-                                                                      EventRequestStatusUpdateRequest
-                                                                              eventRequestStatusUpdateRequest) {
+    public EventRequestStatusUpdateResult updateRequestStatusForEvent(EventRequestStatusUpdateRequest
+                                                                              eventRequestStatusUpdate,
+                                                                      Long eventId, Long userId) {
 
-        List<ParticipationRequestDto> confirmedRequests = new ArrayList<>();
-        List<ParticipationRequestDto> rejectedRequests = new ArrayList<>();
-
-        List<Long> requestsId = eventRequestStatusUpdateRequest.getRequestIds();
-        List<Request> requests = requestRepository.findRequestsById(requestsId);
-        List<Request> reqForSave = new ArrayList<>();
-        List<Event> evForSave = new ArrayList<>();
-
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("User with id {} doesn't exist " + userId));
 
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event with id doesn't exist " + eventId));
+                .orElseThrow(() -> new NotFoundException("Event with id doesn't exist"));
 
-        event.setConfirmedRequests(requestRepository.getConfirmedRequestsByEvent(eventId));
-
-        if (!event.getRequestModeration() || event.getParticipantLimit() == 0L) {
-            throw new RequestConflictException("Do not need accept requests: participant limit equals 0 or " +
-                    "pre-moderation off");
-        }
-
-        long limitBalance = event.getParticipantLimit() - event.getConfirmedRequests();
-        if (event.getParticipantLimit() != 0 && limitBalance <= 0) {
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() == event.getConfirmedRequests()) {
             throw new RequestConflictException("The limit of requests for participation has been reached");
         }
 
-        if (eventRequestStatusUpdateRequest.getStatus().equals(RequestStatus.REJECTED.toString())) {
-            for (Request request : requests) {
-                if (request.getStatus().equals(RequestStatus.PENDING)) {
-                    request.setStatus(RequestStatus.REJECTED);
-                    reqForSave.add(request);
-                    rejectedRequests.add(RequestMapper.toParticipationRequestDto(request));
-                }
-            }
-            requestRepository.saveAll(reqForSave);
+        if (!userId.equals(event.getInitiator().getId())) {
+            throw new RequestConflictException("Only the event initiator can change the status of an event request");
         }
+
+        List<Request> requests = requestRepository.findRequestByIdInAndEventId(eventRequestStatusUpdate.getRequestIds(),
+                eventId);
+
+        if (requests.size() < eventRequestStatusUpdate.getRequestIds().size()) {
+            throw new NotFoundException("Not all specified id in requests correspond to the requested event");
+        }
+
         for (Request request : requests) {
-            if (limitBalance != 0) {
-                if (request.getStatus().equals(RequestStatus.PENDING)) {
-                    request.setStatus(RequestStatus.CONFIRMED);
-                    event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-                    evForSave.add(event);
-                    reqForSave.add(request);
-                    confirmedRequests.add(RequestMapper.toParticipationRequestDto(request));
-                    limitBalance--;
-                }
+            if (!request.getStatus().equals(RequestStatus.PENDING)) {
+                throw new RequestConflictException("The status can only be changed for requests that are in the pending state");
             } else {
-                if (request.getStatus().equals(RequestStatus.PENDING)) {
+                if (eventRequestStatusUpdate.getStatus().equals(RequestStatus.CONFIRMED)) {
+                    if (event.getParticipantLimit() == 0 || event.getParticipantLimit() > event.getConfirmedRequests()) {
+                        request.setStatus(RequestStatus.CONFIRMED);
+                        request.getEvent().setConfirmedRequests(request.getEvent().getConfirmedRequests() + 1);
+                    } else {
+                        request.setStatus(RequestStatus.REJECTED);
+                    }
+                } else if (eventRequestStatusUpdate.getStatus().equals(RequestStatus.REJECTED)) {
                     request.setStatus(RequestStatus.REJECTED);
-                    reqForSave.add(request);
-                    rejectedRequests.add(RequestMapper.toParticipationRequestDto(request));
                 }
             }
         }
-        requestRepository.saveAll(reqForSave);
-        eventRepository.saveAll(evForSave);
+        eventRepository.save(event);
+        requestRepository.saveAll(requests);
+        List<Request> confirmedRequests = requests.stream()
+                .filter(x -> x.getStatus().equals(RequestStatus.CONFIRMED))
+                .collect(Collectors.toList());
+        List<Request> rejectedRequests = requests.stream()
+                .filter(x -> x.getStatus().equals(RequestStatus.REJECTED))
+                .collect(Collectors.toList());
         return EventRequestStatusUpdateResult.builder()
-                .confirmedRequests(confirmedRequests)
-                .rejectedRequests(rejectedRequests)
+                .confirmedRequests(confirmedRequests.stream()
+                        .map(RequestMapper::toParticipationRequestDto).collect(Collectors.toList()))
+                .rejectedRequests(rejectedRequests.stream()
+                        .map(RequestMapper::toParticipationRequestDto).collect(Collectors.toList()))
                 .build();
     }
 
@@ -282,22 +256,41 @@ public class EventServiceImpl implements EventService {
         if (events.isEmpty()) {
             return Collections.emptyList();
         }
-        return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
+        Map<Long, Long> hits = getViewsFromStatistic(events);
+        List<EventShortDto> eventShortDtos = events.stream()
+                .map(EventMapper::toEventShortDto)
+                .peek(e -> e.setViews(hits.getOrDefault(e.getId(), 0L)))
+                .collect(Collectors.toList());
+        return eventShortDtos;
     }
 
     @Override
     public EventFullDto getEventByIdAndUser(long userId, long eventId) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event with id doesn't exist"));
+       /* Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id doesn't exist")); *
+
+        */
+
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId);
+        if (event == null) {
+            throw new NotFoundException("Event with id " + eventId + " doesn't exist");
+        }
         Map<Long, Long> hits = getViewsFromStatistic(List.of(event));
-        event.setViews(hits.get(event.getId()));
-        return toEventFullDto(event);
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        eventFullDto.setViews(hits.getOrDefault(eventFullDto.getId(), 0L));
+        return eventFullDto;
     }
 
     @Override
     public List<ParticipationRequestDto> getAllEventRequests(long userId, long eventId) {
-        Event event = eventRepository.findById(eventId)
+     /*   Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id doesn't exist"));
+
+      */
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId);
+        if (event == null) {
+            throw new NotFoundException("Event with id " + eventId + " doesn't exist");
+        }
         return requestRepository.findAllByEventId(eventId).stream().map(RequestMapper::toParticipationRequestDto)
                 .collect(Collectors.toList());
     }
@@ -511,7 +504,7 @@ public class EventServiceImpl implements EventService {
                                                   Integer size,
                                                   HttpServletRequest request) {
 
-        PageRequest pageRequest = PageRequest.of(from, size);
+        PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size);
         List<Event> events = new ArrayList<>();
 
         if (rangeStart == null) {

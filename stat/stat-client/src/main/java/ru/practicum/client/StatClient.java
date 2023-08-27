@@ -21,10 +21,12 @@ import java.util.Map;
 public class StatClient extends BaseClient {
 
     private static final String SERVER_URL = "http://localhost:9090";
-    private static final String API_PREFIX = "http://stats-server:9090";
+
+    //http://stats-server:9090
+//    ${stats-server.url}
 
     @Autowired
-    public StatClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatClient(@Value("http://localhost:9090") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))

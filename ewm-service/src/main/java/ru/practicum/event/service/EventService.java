@@ -13,11 +13,10 @@ public interface EventService {
 
     EventFullDto addEvent(Long userId, NewEventDto newEventDto);
 
-    EventFullDto updateEvent(long userId, long eventId, UpdateEventUserRequestDto updateEventRequestDto);
+    EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequestDto updateEventRequestDto);
 
-    EventRequestStatusUpdateResult updateRequestStatusForEvent(Long eventId, Long userId,
-                                                               EventRequestStatusUpdateRequest
-                                                                          eventRequestStatusUpdateRequest);
+    EventRequestStatusUpdateResult updateRequestStatusForEvent(EventRequestStatusUpdateRequest
+                                                                       eventRequestStatusUpdate, Long eventId, Long userId);
 
     List<EventShortDto> getAllEventsByUser(long userId, int from, int size);
 

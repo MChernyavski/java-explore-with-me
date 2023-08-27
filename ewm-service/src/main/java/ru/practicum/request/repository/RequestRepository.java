@@ -18,6 +18,8 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     List<Request> findAllByRequesterId(Long userId);
 
+    List<Request> findRequestByIdInAndEventId(List<Long> ids, Long eventId);
+
     @Query("select count(r) from Request r where r.event.id = :eventId and r.status = 'CONFIRMED'")
     Long getConfirmedRequestsByEvent(@Param("eventId") Long eventId);
 
