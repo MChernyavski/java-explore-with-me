@@ -210,10 +210,6 @@ public class EventServiceImpl implements EventService {
         List<Request> requests = requestRepository.findRequestByIdInAndEventId(eventRequestStatusUpdate.getRequestIds(),
                 eventId);
 
-        if (requests.size() < eventRequestStatusUpdate.getRequestIds().size()) {
-            throw new NotFoundException("Not all specified id in requests correspond to the requested event");
-        }
-
         for (Request request : requests) {
             if (!request.getStatus().equals(RequestStatus.PENDING)) {
                 throw new RequestConflictException("The status can only be changed for requests that are in the pending state");
