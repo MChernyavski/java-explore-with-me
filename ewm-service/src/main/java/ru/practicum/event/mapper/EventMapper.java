@@ -3,18 +3,11 @@ package ru.practicum.event.mapper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.category.mapper.CategoryMapper;
-import ru.practicum.category.model.Category;
 import ru.practicum.event.dto.EventFullDto;
 import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.dto.NewEventDto;
 import ru.practicum.event.model.Event;
-import ru.practicum.event.model.Location;
-import ru.practicum.event.model.enums.EventState;
 import ru.practicum.user.mapper.UserMapper;
-import ru.practicum.user.model.User;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import static ru.practicum.event.mapper.LocationMapper.toLocation;
 
@@ -56,7 +49,6 @@ public final class EventMapper {
                 .views(event.getViews())
                 .build();
     }
-
 
     public static Event toEvent(NewEventDto newEventDto) {
         return Event.builder()

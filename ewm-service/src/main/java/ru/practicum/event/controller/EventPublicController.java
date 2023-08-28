@@ -10,7 +10,6 @@ import ru.practicum.event.dto.EventShortDto;
 import ru.practicum.event.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;

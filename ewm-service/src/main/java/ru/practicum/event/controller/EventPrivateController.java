@@ -71,6 +71,6 @@ public class EventPrivateController {
                                                                          EventRequestStatusUpdateRequest
                                                                                  eventRequestStatusUpdate) {
         log.info("Updated request status for event: {}.", eventId);
-        return eventService.updateRequestStatusForEvent(eventRequestStatusUpdate, userId, eventId);
+        return eventService.updateRequestStatusForEvent(eventRequestStatusUpdate, eventId, userId);
     }
 }

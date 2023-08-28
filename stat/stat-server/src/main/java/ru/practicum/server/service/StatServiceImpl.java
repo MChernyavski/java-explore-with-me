@@ -12,7 +12,6 @@ import ru.practicum.server.mapper.ViewStatsMapper;
 import ru.practicum.server.model.EndpointHit;
 import ru.practicum.server.repository.StatRepository;
 
-import javax.xml.bind.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class StatServiceImpl implements StatService {
     @Override
     public List<ViewStatsDto> getStat(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
 
-        if (start == null || end == null) {
+         if (start == null || end == null) {
             throw new TimeException("Error with start time and end time");
         }
         if (start.isAfter(end)) {

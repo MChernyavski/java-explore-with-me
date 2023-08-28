@@ -22,12 +22,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RequestServiceImpl implements RequestService{
+public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
@@ -40,9 +39,9 @@ public class RequestServiceImpl implements RequestService{
 
         List<Request> requests = requestRepository.findAllByRequesterId(userId);
 
-            return requests.stream().
-                    map(RequestMapper::toParticipationRequestDto).
-                    collect(Collectors.toList());
+        return requests.stream().
+                map(RequestMapper::toParticipationRequestDto).
+                collect(Collectors.toList());
     }
 
     @Override
@@ -81,7 +80,7 @@ public class RequestServiceImpl implements RequestService{
                     .build();
 
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-           // eventRepository.save(event);
+            // eventRepository.save(event);
         } else {
             request = Request.builder()
                     .event(event)
@@ -93,9 +92,6 @@ public class RequestServiceImpl implements RequestService{
         Request newRequest = requestRepository.save(request);
         return RequestMapper.toParticipationRequestDto(newRequest);
     }
-
-
-
 
     @Override
     @Transactional

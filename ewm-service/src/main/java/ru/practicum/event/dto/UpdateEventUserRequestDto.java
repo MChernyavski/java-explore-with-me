@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import ru.practicum.event.model.enums.StateUserAction;
 
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 

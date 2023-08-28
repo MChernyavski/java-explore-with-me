@@ -2,15 +2,12 @@ package ru.practicum.event.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import org.hibernate.validator.constraints.Length;
 import ru.practicum.category.model.Category;
 import ru.practicum.event.model.enums.EventState;
-import ru.practicum.request.model.Request;
 import ru.practicum.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
 @Setter
@@ -75,5 +72,4 @@ public class Event {
 
     @Transient
     private Long views;
-
 }

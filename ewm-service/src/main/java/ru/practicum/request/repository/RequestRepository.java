@@ -1,12 +1,10 @@
 package ru.practicum.request.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.practicum.event.model.Event;
 import ru.practicum.request.model.Request;
-import ru.practicum.request.model.RequestStatus;
+
 
 import java.util.List;
 

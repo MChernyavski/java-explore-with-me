@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import ru.practicum.exception.NameConflictException;
 import ru.practicum.user.model.User;
 import ru.practicum.user.dto.NewUserRequestDto;

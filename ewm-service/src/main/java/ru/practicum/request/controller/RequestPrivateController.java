@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.request.dto.ParticipationRequestDto;
 import ru.practicum.request.service.RequestService;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Slf4j

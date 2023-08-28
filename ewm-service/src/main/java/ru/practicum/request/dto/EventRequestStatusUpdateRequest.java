@@ -1,7 +1,6 @@
 package ru.practicum.request.dto;
 
 import lombok.*;
-import ru.practicum.event.model.enums.EventState;
 import ru.practicum.request.model.RequestStatus;
 
 import javax.validation.constraints.NotNull;
