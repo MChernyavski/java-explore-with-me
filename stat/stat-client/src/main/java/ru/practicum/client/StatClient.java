@@ -27,7 +27,7 @@ public class StatClient extends BaseClient {
     }
 
     public ResponseEntity<Object> addStat(EndpointHitDto endpointHitDto) {
-        return post( "/hit", endpointHitDto);
+        return post("/hit", endpointHitDto);
     }
 
     public ResponseEntity<Object> getStat(String start, String end, List<String> uris, boolean unique) {
