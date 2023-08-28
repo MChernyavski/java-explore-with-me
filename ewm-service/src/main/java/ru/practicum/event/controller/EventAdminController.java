@@ -17,7 +17,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(path ="/admin/events")
+@RequestMapping(path = "/admin/events")
 @RequiredArgsConstructor
 @Validated
 public class EventAdminController {

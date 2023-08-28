@@ -39,9 +39,9 @@ public class RequestServiceImpl implements RequestService {
 
         List<Request> requests = requestRepository.findAllByRequesterId(userId);
 
-        return requests.stream().
-                map(RequestMapper::toParticipationRequestDto).
-                collect(Collectors.toList());
+        return requests.stream()
+                .map(RequestMapper::toParticipationRequestDto)
+                .collect(Collectors.toList());
     }
 
     @Override

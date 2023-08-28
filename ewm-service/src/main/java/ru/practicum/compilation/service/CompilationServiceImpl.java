@@ -33,7 +33,7 @@ public class  CompilationServiceImpl implements CompilationService {
     public List<CompilationDto> getAllCompilations(Boolean pinned, Integer from, Integer size) {
         List<Compilation> compilations;
         if (pinned != null) {
-            compilations = compilationRepository.findByPinned(pinned, PageRequest.of(from , size));
+            compilations = compilationRepository.findByPinned(pinned, PageRequest.of(from, size));
         } else {
             compilations = compilationRepository.findAll(PageRequest.of(from, size)).getContent();
         }
