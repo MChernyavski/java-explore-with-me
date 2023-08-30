@@ -36,5 +36,4 @@ public interface EventService {
                                            LocalDateTime rangeStart,
                                            LocalDateTime rangeEnd, Boolean onlyAvailable, String sort,
                                            Integer from, Integer size, HttpServletRequest request);
-
 }

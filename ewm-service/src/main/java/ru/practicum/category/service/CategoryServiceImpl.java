@@ -12,7 +12,6 @@ import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.event.repository.EventRepository;
 import ru.practicum.exception.CategoryConflictException;
-import ru.practicum.exception.NameConflictException;
 import ru.practicum.exception.NotFoundException;
 
 import java.util.List;
@@ -30,10 +29,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
-         if (categoryRepository.existsByName(newCategoryDto.getName())) {
-            log.warn("Can't create category with name: {}, because name already used by another category", newCategoryDto.getName());
-            throw new NameConflictException("Can't create category with name: name already used by another category");
-        }
         Category category = CategoryMapper.toCategory(newCategoryDto);
         Category newCategory = categoryRepository.save(category);
         return CategoryMapper.toCategoryDto(newCategory);
@@ -41,17 +36,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryDto patchCategory(Long catId, NewCategoryDto newCategoryDto) {
+    public CategoryDto patchCategory(Long catId, CategoryDto categoryDto) {
         Category category = categoryRepository.findById(catId).orElseThrow(() ->
                 new NotFoundException("Сategory with id {} doesn't exist " + catId));
-        if (!newCategoryDto.getName().equals(category.getName())) {
-            if (categoryRepository.existsByName(newCategoryDto.getName())) {
-                log.warn("Can't update category with name: {}, because name already used by another category", newCategoryDto.getName());
-                throw new NameConflictException("Can't update category with name: name already used by another category");
-            }
-        }
-        Category updatedCategory = CategoryMapper.toCategory(newCategoryDto);
-        updatedCategory.setId(category.getId());
+        Category updatedCategory = CategoryMapper.toCategory(categoryDto);
+        updatedCategory.setId(catId);
         return CategoryMapper.toCategoryDto(categoryRepository.save(updatedCategory));
     }
 

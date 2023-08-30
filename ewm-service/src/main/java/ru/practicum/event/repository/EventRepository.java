@@ -36,7 +36,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Set<Event> findAllByIdIn(Set<Long> ids);
 
-    @Query("select e from Event e " +
+      @Query("select e from Event e " +
             "where ((:text is null or upper(e.annotation) like upper(concat('%', :text, '%'))) " +
             "or (:text is null or upper(e.description) like upper(concat('%', :text, '%')))) " +
             "and (:state is null or e.state = :state) " +

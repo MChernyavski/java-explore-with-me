@@ -48,15 +48,14 @@ public class RequestServiceImpl implements RequestService {
     @Transactional
     public ParticipationRequestDto addRequest(long userId, long eventId) {
 
+        if (requestRepository.existsRequestByRequesterIdAndEventId(userId, eventId)) {
+            throw new RequestConflictException("You can't add the same request");
+        }
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("User with id {} doesn't exist " + userId));
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id doesn't exist "));
-
-        if (requestRepository.existsRequestByRequesterIdAndEventId(userId, eventId)) {
-            throw new RequestConflictException("You can't add the same request");
-        }
 
         if (event.getInitiator().getId().equals(userId)) {
             throw new RequestConflictException("The initiator can't add a request to participate in his own event");
@@ -80,7 +79,7 @@ public class RequestServiceImpl implements RequestService {
                     .build();
 
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
-            // eventRepository.save(event);
+
         } else {
             request = Request.builder()
                     .event(event)
@@ -102,6 +101,10 @@ public class RequestServiceImpl implements RequestService {
 
         Request request = requestRepository.findById(requestId).orElseThrow(() ->
                 new NotFoundException("Request with id {} doesn't exist " + requestId));
+
+        if (!request.getRequester().getId().equals(userId)) {
+            throw new RequestConflictException("The user can only cancel their own request");
+        }
 
         request.setStatus(RequestStatus.CANCELED);
         request.getEvent().setConfirmedRequests(request.getEvent().getConfirmedRequests() - 1);

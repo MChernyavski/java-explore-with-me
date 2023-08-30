@@ -40,7 +40,6 @@ public class  CompilationServiceImpl implements CompilationService {
         return compilations.stream().map(CompilationMapper::toCompilationDto).collect(Collectors.toList());
     }
 
-
     @Override
     public CompilationDto getCompilationById(Long compId) {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(() ->

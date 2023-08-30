@@ -9,15 +9,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.dto.EndpointHitDto;
 
+import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class StatClient extends BaseClient {
-   // http://localhost:9090/stats
-            //(@Value("${practikum.explore.stat.service.url}")
+
+    @Value("${ewm-service.app}")
+    private String app;
+
     @Autowired
-    public StatClient(@Value("${practikum.explore.stat.service.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatClient(@Value("${stats.service.url}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
@@ -26,9 +30,15 @@ public class StatClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> addStat(EndpointHitDto endpointHitDto) {
-        return post("/hit", endpointHitDto);
-    }
+   public void addStat(HttpServletRequest request) {
+       EndpointHitDto endpointHitDto = new EndpointHitDto();
+       endpointHitDto.setApp(app);
+       endpointHitDto.setUri(request.getRequestURI());
+       endpointHitDto.setIp(request.getRemoteAddr());
+       endpointHitDto.setTimestamp(LocalDateTime.now());
+
+       ResponseEntity<Object> response = post("/hit", endpointHitDto);
+   }
 
     public ResponseEntity<Object> getStat(String start, String end, List<String> uris, boolean unique) {
         Map<String, Object> parameters = Map.of(

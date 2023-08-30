@@ -29,9 +29,9 @@ public class CategoryAdminController {
 
     @PatchMapping("/{catId}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryDto patchCategory(@Valid @RequestBody NewCategoryDto newCategoryDto, @PathVariable long catId) {
-        log.info("Updated category with name {}", newCategoryDto.getName());
-        return categoryService.patchCategory(catId, newCategoryDto);
+    public CategoryDto patchCategory(@Valid @RequestBody CategoryDto categoryDto, @PathVariable long catId) {
+        log.info("Updated category with name {}", categoryDto.getName());
+        return categoryService.patchCategory(catId, categoryDto);
     }
 
     @DeleteMapping("/{catId}")

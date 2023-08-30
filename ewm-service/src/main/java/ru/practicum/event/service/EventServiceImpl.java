@@ -3,9 +3,7 @@ package ru.practicum.event.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.client.StatClient;
-import ru.practicum.dto.EndpointHitDto;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.model.enums.EventSort;
@@ -51,7 +48,6 @@ import static ru.practicum.event.model.enums.EventState.PUBLISHED;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-@ComponentScan("ru.practicum.client")
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
@@ -61,9 +57,6 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final StatClient statClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    @Value("${ewm-service.app}")
-    private String app;
-
 
     @Override
     @Transactional
@@ -74,21 +67,16 @@ public class EventServiceImpl implements EventService {
         Long catId = newEventDto.getCategory();
         Category category = categoryRepository.findById(catId).orElseThrow(() ->
                 new NotFoundException("Сategory with id doesn't exist " + catId));
+        Location location = LocationMapper.toLocation(newEventDto.getLocation());
+        locationRepository.save(location);
 
-        Event event = EventMapper.toEvent(newEventDto);
+        Event event = EventMapper.toEvent(newEventDto, category, user, location);
         LocalDateTime eventDate = event.getEventDate();
 
         if (eventDate.isBefore(LocalDateTime.now().plusHours(2))) {
             throw new WrongTimeException("Field: eventDate. Error: must contain a date that hasn't yet arrived.");
         }
-        event.setCategory(category);
-        event.setCreatedOn(LocalDateTime.now());
-        event.setInitiator(user);
-        event.setState(EventState.PENDING);
-        Location location = LocationMapper.toLocation(newEventDto.getLocation());
-        event.setLocation(locationRepository.save(location));
-        event.setViews(0L);
-        event.setConfirmedRequests(0L);
+
         Event newEvent = eventRepository.save(event);
         return EventMapper.toEventFullDto(newEvent);
     }
@@ -97,14 +85,9 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequestDto updateEventRequestDto) {
 
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("User with id {} doesn't exist " + userId));
-
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event with id doesn't exist"));
-
-        if (!userId.equals(event.getInitiator().getId())) {
-            throw new RequestConflictException("Only the event initiator can change the status of an event request");
+        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId);
+        if (event == null) {
+            throw new NotFoundException("Event with id " + eventId + " doesn't exist");
         }
 
         if (event.getState() == EventState.PUBLISHED) {
@@ -388,7 +371,7 @@ public class EventServiceImpl implements EventService {
         }
 
         eventRepository.save(event);
-        addToStatistic(request);
+        statClient.addStat(request);
         Map<Long, Long> hits = getViewsFromStatistic(List.of(event));
         event.setViews(hits.get(event.getId()));
         return EventMapper.toEventFullDto(event);
@@ -432,14 +415,14 @@ public class EventServiceImpl implements EventService {
                 switch (EventSort.valueOf(sort)) {
                     case EVENT_DATE:
                         events = eventRepository.getAvailableEventsWithFilters(text, PUBLISHED, categories, paid, rangeStart, rangeEnd, pageRequest);
-                        addToStatistic(request);
+                        statClient.addStat(request);
                         return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
 
                     case VIEWS:
                         events = eventRepository.getAvailableEventsFiltersNoSort(text, PUBLISHED, categories, paid, rangeStart, rangeEnd, pageRequest);
                         Map<Long, Long> hits = getViewsFromStatistic(events);
                         events.forEach(event -> event.setViews(hits.get(event.getId())));
-                        addToStatistic(request);
+                        statClient.addStat(request);
                         return events.stream()
                                 .map(EventMapper::toEventShortDto)
                                 .sorted(Comparator.comparing(EventShortDto::getViews))
@@ -454,7 +437,7 @@ public class EventServiceImpl implements EventService {
                     case EVENT_DATE:
                         events = eventRepository.getAllEventsWithFilters(text,
                                 PUBLISHED, categories, paid, rangeStart, rangeEnd, pageRequest);
-                        addToStatistic(request);
+                        statClient.addStat(request);
                         return events.stream()
                                 .map(EventMapper::toEventShortDto)
                                 .collect(Collectors.toList());
@@ -463,7 +446,7 @@ public class EventServiceImpl implements EventService {
                         events = eventRepository.getAllEventsWithFiltersNoSorted(text, PUBLISHED, categories, paid, rangeStart, rangeEnd, pageRequest);
                         Map<Long, Long> hits = getViewsFromStatistic(events);
                         events.forEach(event -> event.setViews(hits.get(event.getId())));
-                        addToStatistic(request);
+                        statClient.addStat(request);
                         return events.stream()
                                 .map(EventMapper::toEventShortDto)
                                 .sorted(Comparator.comparing(EventShortDto::getViews))
@@ -471,19 +454,10 @@ public class EventServiceImpl implements EventService {
                 }
             }
         }
-        addToStatistic(request);
+        statClient.addStat(request);
         return events.stream()
                 .map(EventMapper::toEventShortDto)
                 .collect(Collectors.toList());
-    }
-
-    private void addToStatistic(HttpServletRequest request) {
-        statClient.addStat(EndpointHitDto.builder()
-                .app(app)
-                .uri(request.getRequestURI())
-                .ip(request.getRemoteAddr())
-                .timestamp(LocalDateTime.now())
-                .build());
     }
 
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
