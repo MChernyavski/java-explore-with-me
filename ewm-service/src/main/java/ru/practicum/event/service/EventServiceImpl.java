@@ -499,5 +499,3 @@ public class EventServiceImpl implements EventService {
         return hits;
     }
 }
-
-
