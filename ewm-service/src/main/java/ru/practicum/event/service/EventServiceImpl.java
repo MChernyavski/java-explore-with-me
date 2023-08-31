@@ -393,12 +393,8 @@ public class EventServiceImpl implements EventService {
         PageRequest pageRequest = PageRequest.of(from > 0 ? from / size : 0, size);
         List<Event> events = new ArrayList<>();
 
-        if (rangeStart == null && rangeEnd == null) {
-            rangeStart = LocalDateTime.now();
-        }
-
         if (rangeStart == null) {
-            rangeStart = LocalDateTime.now().minusYears(100);
+            rangeStart = LocalDateTime.now();
         }
         if (rangeEnd == null) {
             rangeEnd = LocalDateTime.now().plusYears(100);
@@ -503,4 +499,5 @@ public class EventServiceImpl implements EventService {
         return hits;
     }
 }
+
 

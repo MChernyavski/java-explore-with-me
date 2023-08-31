@@ -17,7 +17,7 @@ import java.util.Map;
 @Service
 public class StatClient extends BaseClient {
 
-    @Value("${ewm-service.app}")
+    @Value("${application.name}")
     private String app;
 
     @Autowired
