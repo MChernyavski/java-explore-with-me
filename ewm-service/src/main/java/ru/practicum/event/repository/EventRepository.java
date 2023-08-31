@@ -1,6 +1,5 @@
 package ru.practicum.event.repository;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +10,6 @@ import ru.practicum.category.model.Category;
 import ru.practicum.event.model.Event;
 import ru.practicum.event.model.enums.EventState;
 
-import javax.swing.plaf.nimbus.State;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -104,7 +102,4 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                                 @Param("rangeStart") LocalDateTime rangeStart,
                                                 @Param("rangeEnd") LocalDateTime rangeEnd,
                                                 Pageable pageable);
-
-    List<Event> findAllByEventDateIsAfterAndState(
-            LocalDateTime start, EventState state, Pageable pageable);
 }
