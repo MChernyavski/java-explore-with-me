@@ -234,7 +234,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{ \"annotation\": \"Street Food festival is a food festival on new port in Tel Aviv, Israel\",\r\n    \"category\": 1,\r\n    \"description\": \"Street Food festival\",\r\n    \"eventDate\": \"2023-09-10 16:00:00\",\r\n    \"location\": {\r\n        \"lat\": 41.4127,\r\n        \"lon\": 74.5031\r\n    },\r\n    \"paid\": true,\r\n    \"participantLimit\": 450000,\r\n    \"requestModeration\": true,\r\n    \"stateAction\": \"SEND_TO_REVIEW\",\r\n    \"title\": \"Street Food\"\r\n    }"
+          "raw": "{ \"annotation\": \"Street Food festival is a food festival on new port in nord Tel Aviv, Israel\",\r\n    \"category\": 1,\r\n    \"description\": \"Street Food festival\",\r\n    \"eventDate\": \"2023-09-10 16:00:00\",\r\n    \"location\": {\r\n        \"lat\": 41.4127,\r\n        \"lon\": 74.5031\r\n    },\r\n    \"paid\": true,\r\n    \"participantLimit\": 450000,\r\n    \"requestModeration\": true,\r\n    \"stateAction\": \"SEND_TO_REVIEW\",\r\n    \"title\": \"Street Food\"\r\n    }"
         },
         "url": {
           "raw": "http://localhost:8080/users/:userId/events",
