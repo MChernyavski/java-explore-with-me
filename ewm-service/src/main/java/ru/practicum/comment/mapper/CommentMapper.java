@@ -22,6 +22,8 @@ public final class CommentMapper {
                 .author(UserMapper.toUserShorDto(comment.getAuthor()))
                 .event(EventMapper.toEventShortDto(comment.getEvent()))
                 .createdOn(comment.getCreatedOn())
+                .editing(comment.getEditing())
+                .editedOn(comment.getEditedOn())
                 .build();
     }
 
@@ -31,6 +33,7 @@ public final class CommentMapper {
                 .author(author)
                 .event(event)
                 .createdOn(LocalDateTime.now())
+                .editing(false)
                 .build();
     }
 }

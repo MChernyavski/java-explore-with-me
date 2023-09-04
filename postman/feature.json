@@ -291,7 +291,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\": \"Is kebab tasty?\"\r\n}"
+          "raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Is kebab tasty?\"\r\n}"
         },
         "url": {
           "raw": "http://localhost:8080/users/:userId/comments?eventId=1",
@@ -422,6 +422,7 @@
               "    pm.expect(target).to.have.property('author');\r",
               "    pm.expect(target).to.have.property('event');\r",
               "    pm.expect(target).to.have.property('createdOn');\r",
+              "    pm.expect(target).to.have.property('editing');\r",
               "});\r",
               "\r",
               "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
@@ -439,7 +440,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\": \"Is kebab tasty?\"\r\n}",
+          "raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Is kebab tasty?\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -496,7 +497,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\" : \"WI-FI???\"\r\n}",
+          "raw": "{\r\n    \"commentId\" : \"1\",\r\n    \"text\" : \"WI-FI???\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -546,12 +547,14 @@
               "const source = JSON.parse(pm.request.body.raw);\r",
               "const target = pm.response.json();\r",
               "\r",
-              "pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn\", function () {\r",
+              "pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn, editing, editedOn\", function () {\r",
               "    pm.expect(target).to.have.property('id');\r",
               "    pm.expect(target).to.have.property('text');\r",
               "    pm.expect(target).to.have.property('author');\r",
               "    pm.expect(target).to.have.property('event');\r",
               "    pm.expect(target).to.have.property('createdOn');\r",
+              "    pm.expect(target).to.have.property('editing');\r",
+              "    pm.expect(target).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
@@ -569,7 +572,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\" : \"Is kebab tasty, and what about falafel? And atmosphere is good?\"\r\n}",
+          "raw": "{\r\n    \"commentId\" : \"1\",\r\n    \"text\" : \"Is kebab tasty, and what about falafel? And atmosphere is good?\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -625,6 +628,7 @@
               "    pm.expect(target).to.have.property('author');\r",
               "    pm.expect(target).to.have.property('event');\r",
               "    pm.expect(target).to.have.property('createdOn');\r",
+              "    pm.expect(target).to.have.property('editing');\r",
               "});\r",
               "\r",
               "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
@@ -642,7 +646,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\": \"Kebab is perfect\"\r\n}",
+          "raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Kebab is perfect\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -699,6 +703,7 @@
               "    pm.expect(target).to.have.property('author');\r",
               "    pm.expect(target).to.have.property('event');\r",
               "    pm.expect(target).to.have.property('createdOn');\r",
+              "    pm.expect(target).to.have.property('editing');\r",
               "});\r",
               "\r",
               "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
@@ -716,7 +721,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\": \"Kebab is perfect, falafel good and athmoshere amazing\"\r\n}",
+          "raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Kebab is perfect, falafel good and athmoshere amazing\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -767,12 +772,14 @@
               "const source = JSON.parse(pm.request.body.raw);\r",
               "const target = pm.response.json();\r",
               "\r",
-              "pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn\", function () {\r",
+              "pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn, editing, editedOn\", function () {\r",
               "pm.expect(target).to.have.property('id');\r",
               "pm.expect(target).to.have.property('text');\r",
               "pm.expect(target).to.have.property('author');\r",
               "pm.expect(target).to.have.property('event');\r",
               "pm.expect(target).to.have.property('createdOn');\r",
+              "pm.expect(target).to.have.property('editing');\r",
+              "pm.expect(target).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Данные в запросе и ответе должны быть эквивалентны\", function () {\r",
@@ -781,6 +788,8 @@
               "    pm.expect(target.author).to.not.be.null;\r",
               "     pm.expect(target.event).to.not.be.null;\r",
               "    pm.expect(target.createdOn).to.not.be.null;\r",
+              "    pm.expect(target.editing).to.not.be.null;\r",
+              "    pm.expect(target.editedOn).to.not.be.null;\r",
               "});"
             ],
             "type": "text/javascript"
@@ -803,7 +812,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\": \"Kebab is perfect, falafel good and athmoshere amazing. Drink good\"\r\n}"
+          "raw": "{\r\n    \"commentId\" : \"3\",\r\n    \"text\": \"Kebab is perfect, falafel good and athmoshere amazing. Drink good\"\r\n}"
         },
         "url": {
           "raw": "http://localhost:8080/admin/comments/:commentId",
@@ -893,12 +902,14 @@
               "\r",
               "const target = pm.response.json();\r",
               "\r",
-              "pm.test(\"Комментарий 1 должен содержать поля: id, text, author, event, createdOn\", function () {\r",
+              "pm.test(\"Комментарий 1 должен содержать поля: id, text, author, event, createdOn, editing, editedOn\", function () {\r",
               "    pm.expect(target[0]).to.have.property('id');\r",
               "    pm.expect(target[0]).to.have.property('text');\r",
               "    pm.expect(target[0]).to.have.property('author');\r",
               "    pm.expect(target[0]).to.have.property('event');\r",
               "    pm.expect(target[0]).to.have.property('createdOn');\r",
+              "    pm.expect(target[0]).to.have.property('editing');\r",
+              "    pm.expect(target[0]).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Поля комментария 1 должны быть не пустыми\", function () {\r",
@@ -908,6 +919,8 @@
               "    pm.expect(target[0].author).to.have.property('name');\r",
               "    pm.expect(target[0].eventId).to.not.be.null;\r",
               "    pm.expect(target[0].createdOn).to.not.be.null;\r",
+              "    pm.expect(target[0].editing).to.not.be.null;\r",
+              "    pm.expect(target[0].editedOn).to.not.be.null;\r",
               "});\r",
               "\r",
               "pm.test(\"Комментарий 3 должен содержать поля: id, text, author, event, createdOn\", function () {\r",
@@ -916,6 +929,8 @@
               "    pm.expect(target[1]).to.have.property('author');\r",
               "    pm.expect(target[1]).to.have.property('event');\r",
               "    pm.expect(target[1]).to.have.property('createdOn');\r",
+              "     pm.expect(target[1]).to.have.property('editing');\r",
+              "    pm.expect(target[1]).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Поля комментария 3 должны быть не пустыми\", function () {\r",
@@ -925,6 +940,8 @@
               "    pm.expect(target[1].author).to.have.property('name');\r",
               "    pm.expect(target[1].eventId).to.not.be.null;\r",
               "    pm.expect(target[1].createdOn).to.not.be.null;\r",
+              "    pm.expect(target[1].editing).to.not.be.null;\r",
+              "    pm.expect(target[1].editedOn).to.not.be.null;\r",
               "});"
             ],
             "type": "text/javascript"
@@ -999,7 +1016,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\": \"\"\r\n}"
+          "raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"\"\r\n}"
         },
         "url": {
           "raw": "http://localhost:8080/users/2/comments?eventId=2",
@@ -1054,7 +1071,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\": \"Wine is an alcoholic drink typically made from fermented grapes. Yeast consumes the sugar in the grapes and converts it to ethanol and carbon dioxide, releasing heat in the process. Different varieties of grapes and strains of yeasts are major factors in different styles of wine. These differences result from the complex interactions between the biochemical development of the grape, the reactions involved in fermentation, the grape's growing environment (terroir), and the wine production process. Many countries enact legal appellations intended to define styles and qualities of wine. These typically restrict the geographical origin and permitted varieties of grapes, as well as other aspects of wine production. Wines can be made by fermentation of other fruit crops such as plum, cherry, pomegranate, blueberry, currant and elderberry.Wine has been produced for thousands of years. The earliest evidence of wine is from the Caucasus region in today's Georgia (6000 BCE), Persia (5000 BCE), Italy and Armenia (4000 BCE). New World wine has some connection to alcoholic beverages made by the indigenous peoples of the Americas, but is mainly connected to later Spanish traditions in New Spain. Later, as Old World wine further developed viticulture techniques, Europe would encompass three of the largest wine-producing regions. Today, the five countries with the largest wine-producing regions are in Italy, Spain, France, the United States, and China.\"\r\n}"
+          "raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Wine is an alcoholic drink typically made from fermented grapes. Yeast consumes the sugar in the grapes and converts it to ethanol and carbon dioxide, releasing heat in the process. Different varieties of grapes and strains of yeasts are major factors in different styles of wine. These differences result from the complex interactions between the biochemical development of the grape, the reactions involved in fermentation, the grape's growing environment (terroir), and the wine production process. Many countries enact legal appellations intended to define styles and qualities of wine. These typically restrict the geographical origin and permitted varieties of grapes, as well as other aspects of wine production. Wines can be made by fermentation of other fruit crops such as plum, cherry, pomegranate, blueberry, currant and elderberry.Wine has been produced for thousands of years. The earliest evidence of wine is from the Caucasus region in today's Georgia (6000 BCE), Persia (5000 BCE), Italy and Armenia (4000 BCE). New World wine has some connection to alcoholic beverages made by the indigenous peoples of the Americas, but is mainly connected to later Spanish traditions in New Spain. Later, as Old World wine further developed viticulture techniques, Europe would encompass three of the largest wine-producing regions. Today, the five countries with the largest wine-producing regions are in Italy, Spain, France, the United States, and China.\"\r\n}"
         },
         "url": {
           "raw": "http://localhost:8080/users/2/comments?eventId=2",
@@ -1117,7 +1134,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"text\": \"Italian pasta the best\"\r\n}",
+          "raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Italian pasta the best\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -1125,7 +1142,7 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8080/users/:userId/comments?eventId=2",
+          "raw": "http://localhost:8080/users/:userId/comments?eventId=1",
           "protocol": "http",
           "host": [
             "localhost"
@@ -1139,13 +1156,87 @@
           "query": [
             {
               "key": "eventId",
-              "value": "2"
+              "value": "1"
             }
           ],
           "variable": [
             {
               "key": "userId",
               "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Получение определенного комментария пользователя",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json();\r",
+              "\r",
+              "pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn\", function () {\r",
+              "pm.expect(target).to.have.property('id');\r",
+              "pm.expect(target).to.have.property('text');\r",
+              "pm.expect(target).to.have.property('author');\r",
+              "pm.expect(target).to.have.property('event');\r",
+              "pm.expect(target).to.have.property('createdOn');\r",
+              "pm.expect(target).to.have.property('editing');\r",
+              "pm.expect(target).to.have.property('editedOn');\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Данные в запросе и ответе должны быть эквивалентны\", function () {\r",
+              "    pm.expect(target.id).to.not.be.null;\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/users/:userId/comments/:commentId",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "users",
+            ":userId",
+            "comments",
+            ":commentId"
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "1"
+            },
+            {
+              "key": "commentId",
+              "value": "4"
             }
           ]
         }
@@ -1167,12 +1258,14 @@
               "\r",
               "const target = pm.response.json();\r",
               "\r",
-              "pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn\", function () {\r",
+              "pm.test(\"Комментарий должен содержать поля: id, text, author, event, createdOn, editing, editedOn\", function () {\r",
               "    pm.expect(target).to.have.property('id');\r",
               "    pm.expect(target).to.have.property('text');\r",
               "    pm.expect(target).to.have.property('author');\r",
               "    pm.expect(target).to.have.property('event');\r",
               "    pm.expect(target).to.have.property('createdOn');\r",
+              "    pm.expect(target).to.have.property('editing');\r",
+              "    pm.expect(target).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Поля комментария должны быть не пустыми\", function () {\r",
@@ -1182,6 +1275,8 @@
               "    pm.expect(target.author).to.have.property('name');\r",
               "    pm.expect(target.event).to.not.be.null;\r",
               "    pm.expect(target.createdOn).to.not.be.null;\r",
+              "    pm.expect(target.editing).to.not.be.null;\r",
+              "    pm.expect(target.editedOn).to.not.be.null;\r",
               "});"
             ],
             "type": "text/javascript"
@@ -1233,12 +1328,14 @@
               "\r",
               "const target = pm.response.json();\r",
               "\r",
-              "pm.test(\"Комментарий 3 должен содержать поля: id, text, author, event, createdOn\", function () {\r",
+              "pm.test(\"Комментарий 3 должен содержать поля: id, text, author, event, createdOn, editing, editedOn\", function () {\r",
               "    pm.expect(target[0]).to.have.property('id');\r",
               "    pm.expect(target[0]).to.have.property('text');\r",
               "    pm.expect(target[0]).to.have.property('author');\r",
               "    pm.expect(target[0]).to.have.property('event');\r",
               "    pm.expect(target[0]).to.have.property('createdOn');\r",
+              "    pm.expect(target[0]).to.have.property('editing');\r",
+              "    pm.expect(target[0]).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Поля комментария 3 должны быть не пустыми\", function () {\r",
@@ -1248,14 +1345,18 @@
               "    pm.expect(target[0].author).to.have.property('name');\r",
               "    pm.expect(target[0].eventId).to.not.be.null;\r",
               "    pm.expect(target[0].createdOn).to.not.be.null;\r",
+              "    pm.expect(target[0].editing).to.not.be.null;\r",
+              "    pm.expect(target[0].editedOn).to.not.be.null;\r",
               "});\r",
               "\r",
-              "pm.test(\"Комментарий 4 должен содержать поля: id, text, author, event, createdOn\", function () {\r",
+              "pm.test(\"Комментарий 4 должен содержать поля: id, text, author, event, createdOn, editing, editedOn\", function () {\r",
               "    pm.expect(target[1]).to.have.property('id');\r",
               "    pm.expect(target[1]).to.have.property('text');\r",
               "    pm.expect(target[1]).to.have.property('author');\r",
               "    pm.expect(target[1]).to.have.property('event');\r",
               "    pm.expect(target[1]).to.have.property('createdOn');\r",
+              "    pm.expect(target[1]).to.have.property('editing');\r",
+              "    pm.expect(target[1]).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Поля комментария 4 должны быть не пустыми\", function () {\r",
@@ -1265,6 +1366,8 @@
               "    pm.expect(target[1].author).to.have.property('name');\r",
               "    pm.expect(target[1].eventId).to.not.be.null;\r",
               "    pm.expect(target[1].createdOn).to.not.be.null;\r",
+              "    pm.expect(target[1].editing).to.not.be.null;\r",
+              "    pm.expect(target[1].editedOn).to.not.be.null;\r",
               "});"
             ],
             "type": "text/javascript"
@@ -1301,6 +1404,59 @@
               "key": "size",
               "value": "1000"
             }
+          ],
+          "variable": [
+            {
+              "key": "userId",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Запрос пользователем всех своих событий",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.ok;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json()[0];\r",
+              "\r",
+              "pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, countComments\", function () {\r",
+              "    pm.expect(target).to.contain.keys('id', 'title', 'annotation', 'category', 'paid', 'eventDate', 'countComments');\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+              "    pm.expect(target.id).to.not.be.null;\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/users/:userId/events/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "users",
+            ":userId",
+            "events",
+            ""
           ],
           "variable": [
             {
@@ -1354,6 +1510,69 @@
               "key": "commentId",
               "value": "3"
             }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Получение администратором всех событий",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+              "    pm.response.to.be.ok;    \r",
+              "    pm.response.to.be.withBody;\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "const target = pm.response.json()[0];\r",
+              "\r",
+              "pm.test(\"Событие должно содержать поля: id, title, annotation, category, paid, eventDate, countComments\", function () {\r",
+              "    pm.expect(target).to.contain.keys('id', 'title', 'annotation', 'category', 'paid', 'eventDate', 'countComments');\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
+              "    pm.expect(target.id).to.not.be.null;\r",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": ""
+        },
+        "url": {
+          "raw": "http://localhost:8080/admin/events",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "admin",
+            "events"
           ]
         }
       },

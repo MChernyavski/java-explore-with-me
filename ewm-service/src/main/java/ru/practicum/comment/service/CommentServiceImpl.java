@@ -21,6 +21,7 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.user.model.User;
 import ru.practicum.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,10 +37,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentDto addCommentByAuthor(Long userId, Long eventId, NewCommentDto newCommentDto) {
+    public CommentDto addCommentByAuthor(Long userId, NewCommentDto newCommentDto) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("User with id " + userId + " doesn't exist"));
 
+        Long eventId = newCommentDto.getEventId();
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " doesn't exist"));
 
@@ -54,13 +56,15 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentDto editCommentByAuthor(Long commentId, Long userId, UpdateRequestCommentDto updateCommentDto) {
-        Comment comment = commentRepository.findByIdAndAuthorId(commentId, userId);
+    public CommentDto editCommentByAuthor(Long userId, UpdateRequestCommentDto updateCommentDto) {
+        Comment comment = commentRepository.findByIdAndAuthorId(updateCommentDto.getCommentId(), userId);
         if (comment == null) {
-            throw new CommentConflictException("Comment with id " + commentId + " created by user with id " + userId + " doesn't exist");
+            throw new CommentConflictException("Comment with id " + updateCommentDto.getCommentId() + " created by user with id " + userId + " doesn't exist");
         }
 
         comment.setText(updateCommentDto.getText());
+        comment.setEditing(true);
+        comment.setEditedOn(LocalDateTime.now());
         Comment updComment = commentRepository.save(comment);
         return CommentMapper.toCommentDto(updComment);
     }
@@ -76,8 +80,16 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> getAllCommentsByAuthor(Long userId, Integer from, Integer size) {
+    public CommentDto getCommentByIdByAuthor(Long userId, Long commentId) {
+        Comment comment = commentRepository.findByIdAndAuthorId(commentId, userId);
+        if (comment == null) {
+            throw new NotFoundException("Comment with id " + commentId + " created by user with id " + userId + " doesn't exist");
+        }
+        return CommentMapper.toCommentDto(comment);
+    }
 
+    @Override
+    public List<CommentDto> getAllCommentsByAuthor(Long userId, Integer from, Integer size) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("User with id " + userId + " doesn't exist"));
 
@@ -90,10 +102,12 @@ public class CommentServiceImpl implements CommentService {
     //admin
     @Override
     @Transactional
-    public CommentDto editCommentByAdmin(Long commentId, UpdateRequestCommentDto updateCommentDto) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() ->
-                new NotFoundException("User with id " + commentId + " doesn't exist"));
+    public CommentDto editCommentByAdmin(UpdateRequestCommentDto updateCommentDto) {
+        Comment comment = commentRepository.findById(updateCommentDto.getCommentId()).orElseThrow(() ->
+                new NotFoundException("User with id " + updateCommentDto.getCommentId() + " doesn't exist"));
         comment.setText(updateCommentDto.getText());
+        comment.setEditing(true);
+        comment.setEditedOn(LocalDateTime.now());
         Comment updComment = commentRepository.save(comment);
         return CommentMapper.toCommentDto(updComment);
     }

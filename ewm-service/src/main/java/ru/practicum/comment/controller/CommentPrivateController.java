@@ -26,17 +26,17 @@ public class CommentPrivateController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CommentDto createCommentByAuthor(@PathVariable Long userId, @RequestParam Long eventId,
+    public CommentDto createCommentByAuthor(@PathVariable Long userId,
                                             @RequestBody @Valid NewCommentDto newCommentDto) {
-        log.info("Author with id {} added comment to event with id {}", userId, eventId);
-        return commentService.addCommentByAuthor(userId, eventId, newCommentDto);
+        log.info("Author with id {} added comment to event with id {}", userId, newCommentDto.getEventId());
+        return commentService.addCommentByAuthor(userId, newCommentDto);
     }
 
     @PatchMapping("/{commentId}")
-    public CommentDto editCommentByAuthor(@PathVariable Long commentId, @PathVariable Long userId,
+    public CommentDto editCommentByAuthor(@PathVariable Long userId,
                                           @RequestBody @Valid UpdateRequestCommentDto updateCommentDto) {
-        log.info("Comment with id {} edited by author with id {}", commentId, userId);
-        return commentService.editCommentByAuthor(commentId, userId, updateCommentDto);
+        log.info("Comment with id {} edited by author with id {}", updateCommentDto.getCommentId(), userId);
+        return commentService.editCommentByAuthor(userId, updateCommentDto);
     }
 
     @DeleteMapping("/{commentId}")
@@ -46,8 +46,14 @@ public class CommentPrivateController {
         commentService.deleteCommentByAuthor(commentId, userId);
     }
 
+    @GetMapping("/{commentId}")
+    public CommentDto getCommentByIdByAuthor(@PathVariable Long userId, @PathVariable Long commentId) {
+        log.info("Getting comment with id {} by author with id {}", commentId, userId);
+        return commentService.getCommentByIdByAuthor(userId, commentId);
+    }
+
+
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public List<CommentDto> getAllCommentsByAuthor(@PathVariable Long userId,
                                                    @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                                    @RequestParam(defaultValue = "10") @Positive Integer size) {

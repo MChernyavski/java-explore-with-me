@@ -23,7 +23,6 @@ public class CommentPublicController {
     private final CommentService commentService;
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
     public List<CommentDto> getAllCommentsForEventId(@RequestParam Long eventId,
                                                      @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
                                                      @RequestParam(defaultValue = "10") @Positive Integer size) {
@@ -32,7 +31,6 @@ public class CommentPublicController {
     }
 
     @GetMapping("/{commentId}")
-    @ResponseStatus(HttpStatus.OK)
     public CommentDto getCommentById(@PathVariable Long commentId) {
         log.info("Getting comment with id {}", commentId);
         return commentService.getCommentById(commentId);

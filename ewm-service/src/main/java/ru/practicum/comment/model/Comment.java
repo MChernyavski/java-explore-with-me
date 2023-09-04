@@ -36,4 +36,12 @@ public class Comment {
     @Column(name = "created_on")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdOn;
+
+    @Column(name = "editing")
+    private Boolean editing;
+
+    @Column(name = "edited_on")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime editedOn;
+
 }

@@ -37,6 +37,7 @@ public final class EventMapper {
                 .publishedOn(event.getPublishedOn())
                 .requestModeration(event.getRequestModeration())
                 .views(event.getViews())
+                .countComments(event.getCountComments())
                 .build();
     }
 
@@ -51,6 +52,7 @@ public final class EventMapper {
                 .confirmedRequests(event.getConfirmedRequests())
                 .initiator(UserMapper.toUserShorDto(event.getInitiator()))
                 .views(event.getViews())
+                .countComments(event.getCountComments())
                 .build();
     }
 

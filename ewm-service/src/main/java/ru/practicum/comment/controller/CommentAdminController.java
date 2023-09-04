@@ -21,10 +21,9 @@ public class CommentAdminController {
     private final CommentService commentService;
 
     @PatchMapping("/{commentId}")
-    public CommentDto editCommentByAdmin(@PathVariable Long commentId,
-                                         @RequestBody @Valid UpdateRequestCommentDto updateCommentDto) {
-        log.info("Comment with id {} edited by admin", commentId);
-        return commentService.editCommentByAdmin(commentId, updateCommentDto);
+    public CommentDto editCommentByAdmin(@RequestBody @Valid UpdateRequestCommentDto updateCommentDto) {
+        log.info("Comment with id {} edited by admin", updateCommentDto.getCommentId());
+        return commentService.editCommentByAdmin(updateCommentDto);
     }
 
     @DeleteMapping("/{commentId}")
