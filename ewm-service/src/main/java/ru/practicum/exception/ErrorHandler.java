@@ -100,5 +100,16 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now())
                 .build();
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleCommentConflictException(final CommentConflictException e) {
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason(e.toString())
+                .status(HttpStatus.CONFLICT)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
 }
 

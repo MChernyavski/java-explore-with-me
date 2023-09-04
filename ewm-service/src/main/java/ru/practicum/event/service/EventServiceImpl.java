@@ -11,6 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.category.model.Category;
 import ru.practicum.category.repository.CategoryRepository;
 import ru.practicum.client.StatClient;
+import ru.practicum.comment.model.CommentCount;
+import ru.practicum.comment.repository.CommentRepository;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.event.dto.*;
 import ru.practicum.event.model.enums.EventSort;
@@ -55,6 +57,7 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository;
     private final RequestRepository requestRepository;
+    private final CommentRepository commentRepository;
     private final StatClient statClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -219,9 +222,12 @@ public class EventServiceImpl implements EventService {
             return Collections.emptyList();
         }
         Map<Long, Long> hits = getViewsFromStatistic(events);
+        Map<Long, Long> comments = countComments(events);
+
         List<EventShortDto> eventShortDtos = events.stream()
                 .map(EventMapper::toEventShortDto)
                 .peek(e -> e.setViews(hits.getOrDefault(e.getId(), 0L)))
+                .peek(e -> e.setCountComments(comments.getOrDefault(e.getId(), 0L)))
                 .collect(Collectors.toList());
         return eventShortDtos;
     }
@@ -233,8 +239,10 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Event with id " + eventId + " doesn't exist");
         }
         Map<Long, Long> hits = getViewsFromStatistic(List.of(event));
+        Map<Long, Long> comments = countComments(List.of(event));
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
         eventFullDto.setViews(hits.getOrDefault(eventFullDto.getId(), 0L));
+        eventFullDto.setCountComments(comments.getOrDefault(eventFullDto.getId(), 0L));
         return eventFullDto;
     }
 
@@ -277,7 +285,9 @@ public class EventServiceImpl implements EventService {
         List<Event> events = eventRepository.getEventsByParam(users, eventStates, categories, start, end, page);
         events.forEach(event -> event.setConfirmedRequests(requestRepository.getConfirmedRequestsByEvent(event.getId())));
         Map<Long, Long> hits = getViewsFromStatistic(events);
+        Map<Long, Long> comments = countComments(events);
         events.forEach(event -> event.setViews(hits.get(event.getId())));
+        events.forEach(event -> event.setCountComments(comments.get(event.getId())));
         eventRepository.saveAll(events);
         return events.stream()
                 .map(EventMapper::toEventFullDto)
@@ -373,7 +383,9 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
         statClient.addStat(request);
         Map<Long, Long> hits = getViewsFromStatistic(List.of(event));
+        Map<Long, Long> comments = countComments(List.of(event));
         event.setViews(hits.get(event.getId()));
+        event.setCountComments(comments.get(event.getId()));
         return EventMapper.toEventFullDto(event);
     }
 
@@ -412,12 +424,16 @@ public class EventServiceImpl implements EventService {
                     case EVENT_DATE:
                         events = eventRepository.getAvailableEventsWithFilters(text, PUBLISHED, categories, paid, rangeStart, rangeEnd, pageRequest);
                         statClient.addStat(request);
+                        Map<Long, Long> commentsEventDate = countComments(events);
+                        events.forEach(event -> event.setCountComments(commentsEventDate.get(event.getId())));
                         return events.stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
 
                     case VIEWS:
                         events = eventRepository.getAvailableEventsFiltersNoSort(text, PUBLISHED, categories, paid, rangeStart, rangeEnd, pageRequest);
                         Map<Long, Long> hits = getViewsFromStatistic(events);
+                        Map<Long, Long> comments = countComments(events);
                         events.forEach(event -> event.setViews(hits.get(event.getId())));
+                        events.forEach(event -> event.setCountComments(comments.get(event.getId())));
                         statClient.addStat(request);
                         return events.stream()
                                 .map(EventMapper::toEventShortDto)
@@ -434,6 +450,8 @@ public class EventServiceImpl implements EventService {
                         events = eventRepository.getAllEventsWithFilters(text,
                                 PUBLISHED, categories, paid, rangeStart, rangeEnd, pageRequest);
                         statClient.addStat(request);
+                        Map<Long, Long> commentsEventDate = countComments(events);
+                        events.forEach(event -> event.setCountComments(commentsEventDate.get(event.getId())));
                         return events.stream()
                                 .map(EventMapper::toEventShortDto)
                                 .collect(Collectors.toList());
@@ -442,6 +460,8 @@ public class EventServiceImpl implements EventService {
                         events = eventRepository.getAllEventsWithFiltersNoSorted(text, PUBLISHED, categories, paid, rangeStart, rangeEnd, pageRequest);
                         Map<Long, Long> hits = getViewsFromStatistic(events);
                         events.forEach(event -> event.setViews(hits.get(event.getId())));
+                        Map<Long, Long> comments = countComments(events);
+                        events.forEach(event -> event.setCountComments(comments.get(event.getId())));
                         statClient.addStat(request);
                         return events.stream()
                                 .map(EventMapper::toEventShortDto)
@@ -497,5 +517,13 @@ public class EventServiceImpl implements EventService {
             hits.put(Long.parseLong(uri.substring(eventsUri.length())), statsDto.getHits());
         }
         return hits;
+    }
+
+    private Map<Long, Long> countComments(List<Event> events) {
+        List<Long> eventIds = events.stream().map(Event::getId).collect(Collectors.toList());
+        List<CommentCount> commentsCount = commentRepository.getCommentCount(eventIds);
+        Map<Long, Long> commentsMap = commentsCount.stream()
+                .collect(Collectors.toMap(CommentCount::getEventId, CommentCount::getCommentCount));
+        return commentsMap;
     }
 }
