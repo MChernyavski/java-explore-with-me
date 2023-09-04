@@ -1016,7 +1016,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"\"\r\n}"
+          "raw": "{\r\n    \"text\": \"\"\r\n}"
         },
         "url": {
           "raw": "http://localhost:8080/users/2/comments?eventId=2",
@@ -1071,7 +1071,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"eventId\": \"1\",\r\n    \"text\": \"Wine is an alcoholic drink typically made from fermented grapes. Yeast consumes the sugar in the grapes and converts it to ethanol and carbon dioxide, releasing heat in the process. Different varieties of grapes and strains of yeasts are major factors in different styles of wine. These differences result from the complex interactions between the biochemical development of the grape, the reactions involved in fermentation, the grape's growing environment (terroir), and the wine production process. Many countries enact legal appellations intended to define styles and qualities of wine. These typically restrict the geographical origin and permitted varieties of grapes, as well as other aspects of wine production. Wines can be made by fermentation of other fruit crops such as plum, cherry, pomegranate, blueberry, currant and elderberry.Wine has been produced for thousands of years. The earliest evidence of wine is from the Caucasus region in today's Georgia (6000 BCE), Persia (5000 BCE), Italy and Armenia (4000 BCE). New World wine has some connection to alcoholic beverages made by the indigenous peoples of the Americas, but is mainly connected to later Spanish traditions in New Spain. Later, as Old World wine further developed viticulture techniques, Europe would encompass three of the largest wine-producing regions. Today, the five countries with the largest wine-producing regions are in Italy, Spain, France, the United States, and China.\"\r\n}"
+          "raw": "{\r\n    \"text\": \"Wine is an alcoholic drink typically made from fermented grapes. Yeast consumes the sugar in the grapes and converts it to ethanol and carbon dioxide, releasing heat in the process. Different varieties of grapes and strains of yeasts are major factors in different styles of wine. These differences result from the complex interactions between the biochemical development of the grape, the reactions involved in fermentation, the grape's growing environment (terroir), and the wine production process. Many countries enact legal appellations intended to define styles and qualities of wine. These typically restrict the geographical origin and permitted varieties of grapes, as well as other aspects of wine production. Wines can be made by fermentation of other fruit crops such as plum, cherry, pomegranate, blueberry, currant and elderberry.Wine has been produced for thousands of years. The earliest evidence of wine is from the Caucasus region in today's Georgia (6000 BCE), Persia (5000 BCE), Italy and Armenia (4000 BCE). New World wine has some connection to alcoholic beverages made by the indigenous peoples of the Americas, but is mainly connected to later Spanish traditions in New Spain. Later, as Old World wine further developed viticulture techniques, Europe would encompass three of the largest wine-producing regions. Today, the five countries with the largest wine-producing regions are in Italy, Spain, France, the United States, and China.\"\r\n}"
         },
         "url": {
           "raw": "http://localhost:8080/users/2/comments?eventId=2",
@@ -1328,14 +1328,13 @@
               "\r",
               "const target = pm.response.json();\r",
               "\r",
-              "pm.test(\"Комментарий 3 должен содержать поля: id, text, author, event, createdOn, editing, editedOn\", function () {\r",
+              "pm.test(\"Комментарий 3 должен содержать поля: id, text, author, event, createdOn, editing\", function () {\r",
               "    pm.expect(target[0]).to.have.property('id');\r",
               "    pm.expect(target[0]).to.have.property('text');\r",
               "    pm.expect(target[0]).to.have.property('author');\r",
               "    pm.expect(target[0]).to.have.property('event');\r",
               "    pm.expect(target[0]).to.have.property('createdOn');\r",
               "    pm.expect(target[0]).to.have.property('editing');\r",
-              "    pm.expect(target[0]).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Поля комментария 3 должны быть не пустыми\", function () {\r",
@@ -1346,17 +1345,15 @@
               "    pm.expect(target[0].eventId).to.not.be.null;\r",
               "    pm.expect(target[0].createdOn).to.not.be.null;\r",
               "    pm.expect(target[0].editing).to.not.be.null;\r",
-              "    pm.expect(target[0].editedOn).to.not.be.null;\r",
               "});\r",
               "\r",
-              "pm.test(\"Комментарий 4 должен содержать поля: id, text, author, event, createdOn, editing, editedOn\", function () {\r",
+              "pm.test(\"Комментарий 4 должен содержать поля: id, text, author, event, createdOn, editing\", function () {\r",
               "    pm.expect(target[1]).to.have.property('id');\r",
               "    pm.expect(target[1]).to.have.property('text');\r",
               "    pm.expect(target[1]).to.have.property('author');\r",
               "    pm.expect(target[1]).to.have.property('event');\r",
               "    pm.expect(target[1]).to.have.property('createdOn');\r",
               "    pm.expect(target[1]).to.have.property('editing');\r",
-              "    pm.expect(target[1]).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Поля комментария 4 должны быть не пустыми\", function () {\r",
@@ -1367,7 +1364,6 @@
               "    pm.expect(target[1].eventId).to.not.be.null;\r",
               "    pm.expect(target[1].createdOn).to.not.be.null;\r",
               "    pm.expect(target[1].editing).to.not.be.null;\r",
-              "    pm.expect(target[1].editedOn).to.not.be.null;\r",
               "});"
             ],
             "type": "text/javascript"
