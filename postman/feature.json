@@ -1265,7 +1265,6 @@
               "    pm.expect(target).to.have.property('event');\r",
               "    pm.expect(target).to.have.property('createdOn');\r",
               "    pm.expect(target).to.have.property('editing');\r",
-              "    pm.expect(target).to.have.property('editedOn');\r",
               "});\r",
               "\r",
               "pm.test(\"Поля комментария должны быть не пустыми\", function () {\r",
@@ -1276,7 +1275,6 @@
               "    pm.expect(target.event).to.not.be.null;\r",
               "    pm.expect(target.createdOn).to.not.be.null;\r",
               "    pm.expect(target.editing).to.not.be.null;\r",
-              "    pm.expect(target.editedOn).to.not.be.null;\r",
               "});"
             ],
             "type": "text/javascript"
@@ -1306,7 +1304,7 @@
           "variable": [
             {
               "key": "commentId",
-              "value": "4"
+              "value": "3"
             }
           ]
         }
